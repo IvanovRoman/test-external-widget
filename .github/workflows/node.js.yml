@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v4
@@ -22,7 +22,15 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Build
+    - name: Install latest Yarn
+      run: corepack prepare yarn@stable --activate
+
+    - name: Activate latest Yarn
+      run: yarn set version stable
+
+    - name: Install Node.js dependencies
+      run: yarn install --immutable --immutable-cache --check-cache
+
+    - name: Archive
       run: |
-        yarn install
         yarn archive
