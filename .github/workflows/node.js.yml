@@ -34,10 +34,10 @@ jobs:
 
     - name: Move archive files
       run: |
-        mkdir -p temp_folder
-        mv build/test-external-widget.zip ./temp_files
+        mkdir -p widget
+        mv build/test-external-widget.zip ./widget
         rm -rf build
-        cd ./temp_folder
+        cd ./widget
 
     - name: Commit and push archive
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -45,4 +45,6 @@ jobs:
         commit_message: 'Create archive'
         branch: archive
         repository: .
+        add_options: '-u'
+        push_options: '--force'
         create_branch: true
