@@ -25,6 +25,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - name: Install Node.js dependencies
+      run: yarn install --immutable --immutable-cache --check-cache
+
     - name: Production
       run: |
         yarn prod

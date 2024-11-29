@@ -2,7 +2,7 @@
   "name": "external-widget-template",
   "version": "1.0.0",
   "scripts": {
-    "prod": "yarn && webpack --config ./webpack.config.js --progress --mode=production",
+    "prod": "webpack --config ./webpack.config.js --progress --mode=production",
     "dev": "yarn && webpack --config ./webpack.config.js --progress --mode=development",
     "dev:watch": "yarn dev --watch",
     "create:widget": "./node_modules/.bin/external-widget create",
