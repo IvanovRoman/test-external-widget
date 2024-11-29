@@ -37,7 +37,6 @@ jobs:
         mkdir -p widget
         mv build/test-external-widget.zip ./widget
         rm -rf build
-        cd ./widget
 
     - name: Commit and push archive
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -45,6 +44,6 @@ jobs:
         commit_message: 'Create archive'
         branch: archive
         repository: .
-        add_options: '-u'
+        add_options: '-A'
         push_options: '--force'
         create_branch: true
