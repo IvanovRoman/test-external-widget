@@ -37,6 +37,7 @@ jobs:
         mkdir -p temp_folder
         mv build/test-external-widget.zip ./temp_files
         rm -rf build
+        cd ./temp_folder
 
     - name: Commit and push archive
       uses: stefanzweifel/git-auto-commit-action@v4
