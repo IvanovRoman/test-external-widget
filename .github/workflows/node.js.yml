@@ -31,3 +31,9 @@ jobs:
     - name: Archive
       run: |
         yarn archive
+
+    - name: Move archive files
+      run: |
+        cd temp_folder
+        mv build/* .
+        rm -rf build
