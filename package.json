@@ -6,7 +6,7 @@
     "dev": "yarn && webpack --config ./webpack.config.js --progress --mode=development",
     "dev:watch": "yarn dev --watch",
     "create:widget": "./node_modules/.bin/external-widget create",
-    "archive": "./node_modules/.bin/external-widget archive",
+    "archive": "external-widget archive",
     "eslint": "yarn run --binaries-only eslint src ",
     "prepare": "husky"
   },
