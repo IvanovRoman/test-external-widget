@@ -21,6 +21,20 @@ export function joinOr(conditions: TConditionNode[]): TConditionNode {
   return joinConditions(TColumnOperation.co_OR, conditions);
 }
 
+export function hasTextId(type?: string): boolean {
+  return (
+    type === 'String' ||
+    type === 'Text' ||
+    type === 'ID'
+  );
+}
+
+export function getTConditionValue(value: unknown, type?: string) {
+  return hasTextId(type)
+    ? { val: String(value) }
+    : { dVal: Number(value) } satisfies TConditionNode;
+}
+
 const BASE_DATE = Date.UTC(1899, 11, 30);
 const S_PER_DAY = 24 * 3600;
 const MS_PER_DAY = S_PER_DAY * 1000;
