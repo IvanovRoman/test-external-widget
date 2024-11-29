@@ -17,11 +17,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install latest Yarn
-      run: corepack prepare yarn@stable --activate
-
-    - name: Activate latest Yarn
-      run: yarn set version latest --yarn-path
+    - name: Enable Corepack
+      run: corepack enable
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
