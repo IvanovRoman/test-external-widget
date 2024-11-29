@@ -28,6 +28,6 @@ jobs:
     - name: Install Node.js dependencies
       run: yarn install
 
-    # - name: Production
-    #   run: |
-    #     yarn prod
+    - name: Production
+      run: |
+        yarn prod
