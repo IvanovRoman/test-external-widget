@@ -17,16 +17,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-
     - name: Install latest Yarn
       run: corepack prepare yarn@stable --activate
 
     - name: Activate latest Yarn
-      run: yarn set version stable
+      run: yarn set version latest --yarn-path
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
 
     - name: Install Node.js dependencies
       run: yarn install --immutable --immutable-cache --check-cache
