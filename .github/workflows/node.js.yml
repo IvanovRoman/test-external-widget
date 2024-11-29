@@ -34,6 +34,6 @@ jobs:
 
     - name: Move archive files
       run: |
-        cd temp_folder
-        mv build/* .
+        mkdir -p temp_folder
+        mv build/test-external-widget.zip ./temp_files
         rm -rf build
