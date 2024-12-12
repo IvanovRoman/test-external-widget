@@ -29,6 +29,18 @@ export function hasTextId(type?: string): boolean {
   );
 }
 
+export function hasGeo(type?: string): boolean {
+  return type === 'Geo';
+}
+
+function hasNumID(type?: string) {
+  return type === 'NumID';
+}
+
+function hasUUID(type?: string) {
+  return type === 'UUID';
+}
+
 function isObject(value: unknown): value is object {
   return value instanceof Object || {}.toString.call(value) === '[object Object]';
 }
@@ -64,7 +76,7 @@ export function geoToString(value: GeoPoint, stringify = (v: number) => String(v
 }
 
 export function getTConditionValue(value: unknown, type?: string) {
-  return hasTextId(type)
+  return hasTextId(type) || hasNumID(type) || hasUUID(type) || hasGeo(type)
     ? { val: String(value) }
     : { dVal: Number(value) } satisfies TConditionNode;
 }

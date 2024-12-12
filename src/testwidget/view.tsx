@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ColumnInfo, SearchMethod, type ApiRequestor, type BasicStatAggregation,
   type ColumnSortParams, type DatasetInfo, type TConditionNode, type Value, type WidgetArgs } from 'pa-typings';
-import { geoToString, getDurationAsStruct, getTConditionValue,
+import { GeoPoint, geoToString, getDurationAsStruct, getTConditionValue,
+  hasGeo,
   hasTextId, isGeoPoint, joinAnd, variantToDate } from 'helper';
 
 import '@formatjs/intl-durationformat';
@@ -49,10 +50,10 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
     return dsInfo;
   };
 
-  const getValues = async (wrapperGuid: string, rowCount = 0, offset = 0) => {
+  const getValues = async (wrapperGuid: string, rowCount = info.rowCount, offset = 0) => {
     const data = await requestor.values({
       offset,
-      rowCount: rowCount <= 0 ? info.rowCount : rowCount,
+      rowCount,
       wrapperGuid: wrapperGuid
     });
     if (data.table) {
@@ -184,6 +185,10 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
       });
   };
 
+  const convertGeoToJSON = (v: GeoPoint) => {
+    return `{${v.latitude}; ${v.longitude}; ${v.elevation}}`;
+  };
+
   const onDrillDown = async (id: number) => {
     if (args?.isEditor)
       return;
@@ -197,9 +202,10 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
       offset: 1
     });
     const condition = joinAnd(cols.map(({ title, type }, i) => {
+      const value = data.table![0][i];
       return {
         columnName: title,
-        ...getTConditionValue(data.table![0][i], type)
+        ...getTConditionValue(hasGeo(type) ? convertGeoToJSON(value as unknown as GeoPoint) : value, type)
       };
     }));
     condition.cdata = JSON.stringify([id]);
@@ -207,8 +213,8 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
     args?.openDrillDown(condition, { navigate: undefined });
   };
 
-  const getDataValue = (value: Value, colId: number) => {
-    switch (info.columns[colId].type) {
+  const getDataValue = (value: Value, colId: number, columns: ColumnInfo[]) => {
+    switch (columns[colId].type) {
       case 'Integer':
         return Number(value);
       case 'Bool':
@@ -240,9 +246,9 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
     let columns = info.columns;
     if (stateGuid.current.distinctGuid) {
       columns = [
-        { id: 0, title: 'Value' },
-        { id: 1, title: 'Count' },
-        { id: 2, title: 'Percent' }
+        { id: 0, title: 'Value', type: columns[columnId].type },
+        { id: 1, title: 'Count', type: 'Integer' },
+        { id: 2, title: 'Percent', type: 'Integer' }
       ] as ColumnInfo[];
     }
 
@@ -261,7 +267,7 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
               return (
                 <tr key={id} onClick={() => onDrillDown(+id)}>
                   <th key={id}>{id}</th>
-                  {v.map((r, i) => (<th key={i}>{getDataValue(r, i)}</th>))}
+                  {v.map((r, i) => (<th key={i}>{getDataValue(r, i, columns)}</th>))}
                 </tr>
               );
             })}
@@ -271,8 +277,8 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
     );
   };
 
-  return (
-    <div className='main'>
+  const rendererColumnSelector = () => {
+    return (
       <div style={{ width: '100%', padding: '5px 0' }}>
         <label htmlFor='columns'>Choose a column:</label>
         <select
@@ -288,6 +294,11 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
           {info.columns.map(c => (<option key={c.id} value={c.id}>{c.title}</option>))}
         </select>
       </div>
+    );
+  };
+
+  const rendererDistinctButton = () => {
+    return (
       <div style={{ width: '100%', padding: '5px 0' }}>
         <button
           id='distinct'
@@ -296,6 +307,11 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
           {stateGuid.current.distinctGuid ? 'Not distinct values' : 'Distinct values'}
         </button>
       </div>
+    );
+  };
+
+  const rendererGetRowCount = () => {
+    return (
       <div style={{ width: '100%', padding: '5px 0' }}>
         <label htmlFor='rowCount'>Get row count</label>
         <input
@@ -312,6 +328,11 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
           Send
         </button>
       </div>
+    );
+  };
+
+  const rendererFilter = () => {
+    return (
       <div
         style={{
           display: 'flex',
@@ -344,6 +365,11 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
           </button>
         </div>
       </div>
+    );
+  };
+
+  const rendererSort = () => {
+    return (
       <div
         style={{
           display: 'flex',
@@ -376,6 +402,16 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
           Sort by value
         </button>
       </div>
+    );
+  };
+
+  return (
+    <div className='main'>
+      {rendererColumnSelector()}
+      {rendererDistinctButton()}
+      {rendererGetRowCount()}
+      {rendererFilter()}
+      {rendererSort()}
       <div
         style={{
           display: 'flex',
@@ -385,11 +421,18 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
         }}
       >
         <button onClick={getStatistics}>Statistics</button>
-        <div style={{ display: 'flex', gap: 2 }}>
+        <div style={{
+          display: 'grid',
+          gridAutoFlow: 'column dense',
+          gridTemplateRows: '20px 20px',
+          gridTemplateColumns: 'auto',
+        }}
+        >
           {stats.map((s) => (
-            <div key={s.type}>
-              {`${s.type} ${s.value}`}
-            </div>
+            <React.Fragment key={s.type}>
+              <div>{s.type}</div>
+              <div>{s.value}</div>
+            </React.Fragment>
           ))}
         </div>
       </div>
