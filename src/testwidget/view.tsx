@@ -3,7 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ColumnInfo, SearchMethod, type ApiRequestor, type BasicStatAggregation,
   type ColumnSortParams, type DatasetInfo, type TConditionNode, type Value, type WidgetArgs } from 'pa-typings';
-import { getTConditionValue, hasTextId, joinAnd, joinOr } from 'helper';
+import { geoToString, getDurationAsStruct, getTConditionValue,
+  hasTextId, isGeoPoint, joinAnd, variantToDate } from 'helper';
+
+import '@formatjs/intl-durationformat';
 
 import './styles.css';
 
@@ -204,6 +207,35 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
     args?.openDrillDown(condition, { navigate: undefined });
   };
 
+  const getDataValue = (value: Value, colId: number) => {
+    switch (info.columns[colId].type) {
+      case 'Integer':
+        return Number(value);
+      case 'Bool':
+        return Boolean(value).toString();
+      case 'NumID':
+        return String(value);
+      case 'DateTime':
+        return variantToDate(+value).toLocaleString();
+      case 'String':
+        return String(value);
+      case 'Duration': {
+        const duration = getDurationAsStruct(+value);
+        return new Intl.DurationFormat('en', { style: 'short' }).format(duration);
+      }
+      case 'Numeric':
+        return Number(value);
+      case 'Text':
+        return String(value);
+      case 'Geo':
+        return isGeoPoint(value) ? geoToString(value) : value;
+      case 'UUID':
+        return String(value);
+      default:
+        return value;
+    }
+  };
+
   const rendererTable = () => {
     let columns = info.columns;
     if (stateGuid.current.distinctGuid) {
@@ -229,7 +261,7 @@ export const TestWidget: React.FC<Props> = ({ requestor, args, setCondition }) =
               return (
                 <tr key={id} onClick={() => onDrillDown(+id)}>
                   <th key={id}>{id}</th>
-                  {v.map((r, i) => (<th key={i}>{r}</th>))}
+                  {v.map((r, i) => (<th key={i}>{getDataValue(r, i)}</th>))}
                 </tr>
               );
             })}
