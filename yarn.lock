@@ -2550,7 +2550,7 @@ external-widget-cli@megaputer/external-widget-cli:
     yargs: "npm:17.7.2"
   bin:
     external-widget: ./bin/index.js
-  checksum: 10c0/23b405658575658d65f2f05b2913902122fff71907e4ebbac07bb97d5e16eadc85b59b0ab575ba66426831a134ef708a2d3ff8dd9043332fd526a54765fdda90
+  checksum: 10c0/66d79274b848628ab85cc69a94b4baa0645b00399a9b1832618cbb40ca7b0e2117a8e0a63835424f70acc5788541c285c89e1a14e937880953a7f75d69eba054
   languageName: node
   linkType: hard
 
@@ -4582,7 +4582,7 @@ external-widget-cli@megaputer/external-widget-cli:
 "pa-typings@megaputer/pa-typings#main":
   version: 1.1.2
   resolution: "pa-typings@https://github.com/megaputer/pa-typings.git#commit=4fee2a541dfb8142424bdbfc822b2f5ad28ceca7"
-  checksum: 10c0/c2ec125bb475b44df1f2a46de1e7b473b3f8335d49066ba79ec2b7b2bb3cdbeb06e3753a5be0e331095294d95b9068b23ec74c102f10c28fa61d6857aa2fa3e2
+  checksum: 10c0/8c8b8cc4bf60778fb2f41d6702ef973a0b43f4ba330d013c0bc395ef9787fd4a95d29d425c0c0002730f79cef0735af72912319d351b88aa990ac78cf9604490
   languageName: node
   linkType: hard
 
